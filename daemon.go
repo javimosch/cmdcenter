@@ -5,12 +5,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
 const (
-	pidFile = "/tmp/boilerplate-cli-ui-go.pid"
-	logFile = "/tmp/boilerplate-cli-ui-go.log"
+	pidFile = "/tmp/cmdcenter.pid"
+	logFile = "/tmp/cmdcenter.log"
 )
 
 func startDaemon(port int) {
@@ -29,6 +30,11 @@ func startDaemon(port int) {
 
 	// Create command to run server in foreground
 	cmd := exec.Command(execPath, "start", fmt.Sprintf("-port=%d", port))
+	
+	// Rotate logs before starting
+	if err := rotateLogFile(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error rotating log file: %v\n", err)
+	}
 	
 	// Set up logging
 	logFileHandle, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
@@ -146,4 +152,31 @@ func getExecutablePath() (string, error) {
 	}
 
 	return resolvedPath, nil
+}
+
+func rotateLogFile() error {
+	// Read existing log file
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // No log file yet, nothing to rotate
+		}
+		return err
+	}
+	
+	lines := strings.Split(string(content), "\n")
+	
+	// Rotate if exceeds max lines (2000)
+	if len(lines) > 2000 {
+		// Keep only the last 2000 lines
+		lines = lines[len(lines)-2000:]
+		rotatedContent := strings.Join(lines, "\n")
+		
+		// Write back to file
+		if err := os.WriteFile(logFile, []byte(rotatedContent), 0644); err != nil {
+			return err
+		}
+	}
+	
+	return nil
 }

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Build Go CLI with UI - Default
-go build -o boilerplate-cli-ui-go-default main.go server.go daemon.go
-ls -lh boilerplate-cli-ui-go-default
+# Build cmdcenter - Default
+go build -o cmdcenter-default main.go server.go daemon.go config.go
+ls -lh cmdcenter-default
 
-# Build Go CLI with UI - Optimized
-go build -ldflags "-s -w" -o boilerplate-cli-ui-go-optimized main.go server.go daemon.go
-ls -lh boilerplate-cli-ui-go-optimized
+# Build cmdcenter - Optimized
+go build -ldflags "-s -w" -o cmdcenter-optimized main.go server.go daemon.go config.go
+ls -lh cmdcenter-optimized

@@ -1,224 +1,238 @@
-# Boilerplate CLI UI Go
+# cmdcenter
 
-**In 2026, every app is a CLI, even UI based.**
-
-This is a boilerplate for crafting UI-based applications packed as single binaries, designed to work as plugins for [SuperCLI](https://github.com/javimosch/supercli). It demonstrates how modern applications should be built: CLI-first with optional web interfaces, compiled to portable binaries.
-
-## Philosophy
-
-**CLI-Native, Web-Enabled**
-
-Modern applications should be CLI-native by default, with web interfaces as an enhancement rather than a requirement. This approach provides:
-
-- **Scriptable**: Perfect for automation and CI/CD
-- **Portable**: Single binary works everywhere
-- **Manageable**: Daemon mode for background services
-- **Accessible**: Web UI when visual interaction is preferred
-- **Composable**: Designed to work as SuperCLI plugins
-
-## SuperCLI Integration
-
-This boilerplate is specifically designed to create plugins for [SuperCLI](https://github.com/javimosch/supercli):
-
-- **Plugin Structure**: Follows SuperCLI plugin conventions
-- **Binary Size**: Optimized to ~5MB for fast distribution
-- **CLI Commands**: Start/stop/status for daemon management
-- **HTTP Interface**: Optional web UI for plugin configuration
-- **Process Management**: Background daemon mode for long-running plugins
+Generic command execution dashboard with configurable commands via JSON config file. Provides both a modern web UI and CLI for managing and executing shell commands.
 
 ## Features
 
-- **CLI-First Design**: Primary interface is command-line
-- **HTTP Server**: Built-in web server for visual interface
-- **Daemon Mode**: Background process with start/stop/status
-- **Single Binary**: Compiles to one executable, no dependencies
-- **Web UI**: Clean, modern interface for visual interaction
-- **API Endpoints**: JSON API for programmatic access
-- **Portable**: Works on any system with the binary
+- 🎯 **Generic Command Center**: Execute any shell commands from a web UI
+- ⚙️ **Configurable Commands**: Define commands in `~/.cmdcenter/config.json`
+- 🔧 **CLI Management**: Full CRUD operations via command-line interface
+- 📋 **Command Logging**: All command executions logged with timestamps and status
+- 🔍 **Search Logs**: Search through daemon logs with filtering
+- 🗑️ **Log Management**: Clear logs when needed
+- 🎨 **Modern UI**: Argentine flag color scheme with bento-grid layout
+- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
+- 🚀 **Daemon Mode**: Run as background service
+- 💬 **Non-blocking Toasts**: Custom toast notifications instead of native alerts
+- 🔄 **Argument Support**: Commands can accept extra arguments
+- 🤖 **Agent-first**: Designed for AI/agent workflows with comprehensive CLI
 
-## Architecture
+## Installation
 
+### From Source
+```bash
+git clone https://github.com/yourusername/cmdcenter.git
+cd cmdcenter
+go build -o cmdcenter
+./cmdcenter init
 ```
-CLI (boilerplate-cli-ui-go)
-├── main.go - CLI commands and flag parsing
-├── server.go - HTTP server and web UI
-└── daemon.go - Process management
+
+### Via Supercli
+```bash
+sc install cmdcenter
 ```
 
-## Usage
+## Quick Start
+
+### Initialize Config
+```bash
+cmdcenter init
+```
+
+This creates `~/.cmdcenter/config.json` with an empty commands array.
+
+### Add Commands
+```bash
+# Add a simple command
+cmdcenter add --id status --name "System Status" --command "uptime" --icon "📊"
+
+# Add command with argument support
+cmdcenter add --id df --name "Disk Free" --command "df" --icon "💾" --supports-args
+```
+
+### Start Web UI
+```bash
+# Start in foreground
+cmdcenter start
+
+# Start as daemon
+cmdcenter start -daemon
+
+# Start on custom port
+cmdcenter start -port 3000
+```
+
+Access the UI at `http://localhost:3031`
+
+### Execute Commands
+```bash
+# Via CLI
+cmdcenter run --id status
+
+# With arguments (if supports-args enabled)
+cmdcenter run --id df --args "-h /"
+```
+
+## CLI Usage
+
+### Config Commands
+```bash
+cmdcenter init                          # Initialize config file
+cmdcenter add --id <id> --name <name> --command <cmd> [--icon <emoji>] [--supports-args]
+cmdcenter edit --id <id> [--name <name>] [--command <cmd>] [--icon <emoji>] [--supports-args]
+cmdcenter remove --id <id>
+cmdcenter list                            # List all commands
+```
+
+### Execution Commands
+```bash
+cmdcenter run --id <id> [--args <args>]  # Execute a command
+```
+
+### Server Commands
+```bash
+cmdcenter start [-port <port>] [-daemon]  # Start HTTP server
+cmdcenter stop                            # Stop daemon
+cmdcenter status                          # Check daemon status
+cmdcenter version                         # Show version
+```
+
+## Configuration
+
+Config file location: `~/.cmdcenter/config.json`
+
+### Example Config
+```json
+{
+  "title": "Command Center",
+  "subtitle": "Generic command execution dashboard",
+  "commands": [
+    {
+      "id": "status",
+      "name": "System Status",
+      "description": "Check system status",
+      "icon": "📊",
+      "command": "uptime",
+      "supports_args": false
+    },
+    {
+      "id": "df",
+      "name": "Disk Free",
+      "description": "Show disk free space",
+      "icon": "💾",
+      "command": "df",
+      "supports_args": true
+    }
+  ]
+}
+```
+
+### Command Fields
+- `id`: Unique identifier (required)
+- `name`: Display name (required)
+- `command`: Shell command to execute (required)
+- `description`: Command description
+- `icon`: Emoji icon
+- `supports_args`: Enable argument input modal/CLI args support
+
+## Web UI Features
+
+### Command Execution
+- Click command buttons to execute
+- Commands with `supports_args: true` show argument input modal
+- Live command output display
+- Success/error feedback with custom toasts
+
+### Command Management
+- Add/Edit/Delete commands via UI
+- Raw JSON config editing
+- Live config reload
+- Form validation
+
+### Log Management
+- View daemon logs in real-time
+- Search/filter logs
+- Auto-refresh every 10 seconds
+- Clear logs on demand
+
+### UI Features
+- Non-blocking toast notifications
+- Custom confirmation dialogs
+- Responsive bento-grid layout
+- Argentine flag color scheme
+- Mobile-friendly design
+
+## Development
 
 ### Build
-
 ```bash
-chmod +x build.sh
 ./build.sh
 ```
 
-### CLI Commands
+This creates two binaries:
+- `cmdcenter-default`: Standard build
+- `cmdcenter-optimized`: Optimized build
 
-**Start HTTP server (foreground):**
+### Project Structure
+```
+cmdcenter/
+├── main.go           # CLI entry point
+├── server.go         # HTTP server and UI
+├── daemon.go         # Daemon management
+├── config.go         # Config file handling
+├── build.sh          # Build script
+├── AGENTS.md         # Agent documentation
+├── README.md         # This file
+└── .agents/
+    └── skills/
+        └── cmdcenter-cheatsheet/  # Agent skill
+```
+
+## API Endpoints
+
+### Command Execution
+- `POST /api/command` - Execute command (JSON: `{"command": "id", "args": "optional"}`)
+
+### Config Management
+- `GET /api/config` - Get current config
+- `POST /api/config/reload` - Reload config from file
+- `GET /api/config/commands` - Get all commands
+- `POST /api/config/commands/add` - Add command
+- `POST /api/config/commands/edit` - Edit command
+- `POST /api/config/commands/remove` - Remove command
+- `GET /api/config/raw` - Get raw config JSON
+- `POST /api/config/raw` - Save raw config JSON
+
+### Logs
+- `GET /api/logs` - Get daemon logs (optional `?search=query`)
+- `POST /api/logs/clear` - Clear daemon logs
+
+### System
+- `GET /api/status` - Server status
+- `GET /api/health` - Health check
+
+## Agent Usage
+
+cmdcenter is designed to be agent-first. AI agents can use the CLI for all operations without needing the web UI. See `AGENTS.md` for detailed agent documentation.
+
+### Example Agent Workflow
 ```bash
-./boilerplate-cli-ui-go-optimized start
+# Setup commands for a task
+cmdcenter add --id deploy --name "Deploy" --command "./deploy.sh" --icon "🚀"
+cmdcenter add --id test --name "Run Tests" --command "./test.sh" --icon "✅"
+
+# Execute commands
+cmdcenter run --id deploy
+cmdcenter run --id test
+
+# Cleanup
+cmdcenter remove --id deploy
 ```
-
-**Start HTTP server on custom port:**
-```bash
-./boilerplate-cli-ui-go-optimized start -port 3000
-```
-
-**Start as daemon (background):**
-```bash
-./boilerplate-cli-ui-go-optimized start -daemon
-```
-
-**Start daemon on custom port:**
-```bash
-./boilerplate-cli-ui-go-optimized start -port 3000 -daemon
-```
-
-**Stop daemon:**
-```bash
-./boilerplate-cli-ui-go-optimized stop
-```
-
-**Check daemon status:**
-```bash
-./boilerplate-cli-ui-go-optimized status
-```
-
-**Show version:**
-```bash
-./boilerplate-cli-ui-go-optimized version
-```
-
-## Web Interface
-
-When the server is running, access the UI at:
-- `http://localhost:8080` (default port)
-- `http://localhost:3000` (if started with -port 3000)
-
-### API Endpoints
-
-- `GET /` - Web UI
-- `GET /api/status` - Server status (JSON)
-- `GET /api/health` - Health check (JSON)
-
-## Daemon Management
-
-The daemon mode allows the HTTP server to run in the background:
-
-- **PID File**: `/tmp/boilerplate-cli-ui-go.pid`
-- **Log File**: `/tmp/boilerplate-cli-ui-go.log`
-- **Process Control**: SIGTERM for graceful shutdown
-
-## Binary Size
-
-- **Default**: ~7.3MB
-- **Optimized**: ~5.0MB (with `-ldflags "-s -w"`)
-
-The optimized size is ideal for SuperCLI plugin distribution.
-
-## SuperCLI Plugin Development
-
-To use this as a SuperCLI plugin:
-
-1. **Customize the CLI commands** for your specific use case
-2. **Extend the HTTP server** with your plugin's web UI
-3. **Add plugin-specific API endpoints** for configuration
-4. **Build the optimized binary** for distribution
-5. **Package as SuperCLI plugin** following plugin conventions
-
-### Example Plugin Structure
-
-```go
-// Replace the greet command with your plugin's commands
-case "my-plugin":
-    handleMyPlugin()
-case "start":
-    handleStart()  // Keep daemon management
-```
-
-## Requirements
-
-- Go 1.21+
-
-## Examples
-
-### Development Workflow
-```bash
-# Build the binary
-./build.sh
-
-# Start server in foreground for development
-./boilerplate-cli-ui-go-optimized start
-
-# In another terminal, test the API
-curl http://localhost:8080/api/status
-
-# Stop with Ctrl+C
-```
-
-### Production Workflow
-```bash
-# Start as daemon
-./boilerplate-cli-ui-go-optimized start -daemon
-
-# Check status
-./boilerplate-cli-ui-go-optimized status
-
-# View logs
-tail -f /tmp/boilerplate-cli-ui-go.log
-
-# Stop when done
-./boilerplate-cli-ui-go-optimized stop
-```
-
-## Use Cases
-
-- **SuperCLI Plugins**: UI-enabled plugins for SuperCLI
-- **CLI Tools**: Add web interface to existing CLI tools
-- **Microservices**: Small HTTP services with CLI management
-- **Admin Panels**: Simple admin interfaces for system tools
-- **Development**: Quick prototyping of CLI + web applications
-- **Monitoring**: Status dashboards for long-running processes
-
-## Modern App Philosophy
-
-**CLI + Web = Perfect Combination**
-
-This boilerplate embodies the modern application philosophy:
-
-1. **CLI First**: Build for automation and scripting
-2. **Web Enhanced**: Add visual interfaces when needed
-3. **Single Binary**: Easy distribution and installation
-4. **Daemon Capable**: Background services when required
-5. **Plugin Ready**: Designed for ecosystem integration
-
-**Why This Matters:**
-
-- **DevOps Friendly**: Perfect for CI/CD pipelines
-- **User Friendly**: Web UI for visual users
-- **Portable**: Single binary, no runtime dependencies
-- **Maintainable**: Simple architecture, easy to extend
-- **Extensible**: Plugin system for ecosystem growth
-
-## Future Enhancements
-
-- [ ] Add configuration file support
-- [ ] Add authentication for web UI
-- [ ] Add HTTPS support
-- [ ] Add systemd service file generation
-- [ ] Add more API endpoints
-- [ ] Add database integration
-- [ ] Add metrics/monitoring
-- [ ] Add SuperCLI plugin packaging script
-
-## Related Projects
-
-- [SuperCLI](https://github.com/javimosch/supercli) - Universal CLI framework
-- [supercli-clis](https://github.com/jarancibia/supercli-clis) - Collection of SuperCLI plugins
-- [boilerplate-cli](https://github.com/javimosch/supercli-cli-boilerplates) - Binary size benchmarks
 
 ## License
 
-This boilerplate is provided as-is for educational and development purposes.
+MIT
+
+## Contributing
+
+Contributions welcome! Please read AGENTS.md for agent-specific guidelines.
