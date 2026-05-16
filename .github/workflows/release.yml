@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Go (linux/amd64)
+        run: |
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o cmdcenter-linux-amd64 main.go
+
+      - name: Build Go (linux/arm64)
+        run: |
+          GOOS=linux GOARCH=arm64 go build -ldflags "-s -w" -o cmdcenter-linux-arm64 main.go
+
+      - name: Build Go (darwin/amd64)
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o cmdcenter-darwin-amd64 main.go
+
+      - name: Build Go (darwin/arm64)
+        run: |
+          GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w" -o cmdcenter-darwin-arm64 main.go
+
+      - name: Collect binaries
+        run: |
+          mkdir -p release
+          cp cmdcenter-* release/
+          cd release && sha256sum * > checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          fail_on_unmatched_files: false

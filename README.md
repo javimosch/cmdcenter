@@ -26,7 +26,7 @@ The easiest way to install cmdcenter is via [supercli](https://github.com/javimo
 
 ```bash
 # Install supercli
-npm install -g @javimosch/supercli
+npm install -g superacli
 
 # Install cmdcenter plugin
 sc plugins install cmdcenter
@@ -239,9 +239,7 @@ cmdcenter remove --id deploy
 
 ## Links
 
-- [GitHub Repository](https://github.com/javimosch/cmdcenter)
 - [supercli](https://github.com/javimosch/supercli) - Plugin management and discovery
-- [supercli-clis](https://github.com/javimosch/cmdcenter) - Binary source for supercli plugin
 
 ## License
 
