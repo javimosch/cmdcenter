@@ -2,6 +2,8 @@
 
 Generic command execution dashboard with configurable commands via JSON config file. Provides both a modern web UI and CLI for managing and executing shell commands.
 
+**Author**: Javier Leandro Arancibia
+
 ## Features
 
 - 🎯 **Generic Command Center**: Execute any shell commands from a web UI
@@ -19,17 +21,23 @@ Generic command execution dashboard with configurable commands via JSON config f
 
 ## Installation
 
+### Via Supercli (Recommended)
+The easiest way to install cmdcenter is via [supercli](https://github.com/javimosch/supercli):
+
+```bash
+# Install supercli
+npm install -g @javimosch/supercli
+
+# Install cmdcenter plugin
+sc plugins install cmdcenter
+```
+
 ### From Source
 ```bash
-git clone https://github.com/yourusername/cmdcenter.git
+git clone https://github.com/javimosch/cmdcenter.git
 cd cmdcenter
 go build -o cmdcenter
 ./cmdcenter init
-```
-
-### Via Supercli
-```bash
-sc install cmdcenter
 ```
 
 ## Quick Start
@@ -228,6 +236,12 @@ cmdcenter run --id test
 # Cleanup
 cmdcenter remove --id deploy
 ```
+
+## Links
+
+- [GitHub Repository](https://github.com/javimosch/cmdcenter)
+- [supercli](https://github.com/javimosch/supercli) - Plugin management and discovery
+- [supercli-clis](https://github.com/javimosch/cmdcenter) - Binary source for supercli plugin
 
 ## License
 
