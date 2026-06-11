@@ -103,218 +103,274 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9F9F8;
+            --border-color: #EAEAEA;
+            --text-primary: #111111;
+            --text-secondary: #787774;
+            --accent-black: #111111;
+            --accent-gray: #333333;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(180deg, #75AADB 0%, #FFFFFF 50%, #75AADB 100%);
-            min-height: 100dvh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
+            line-height: 1.6;
         }
+        
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(117, 170, 219, 0.25);
-            padding: 32px;
+            max-width: 1200px;
             width: 100%;
         }
-        .header-card {
-            background: linear-gradient(135deg, #75AADB 0%, #6a9ed0 100%);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
-            color: white;
-            grid-column: span 2;
+        
+        .header {
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
         }
-        .header-card h1 { 
-            color: white;
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
             margin-bottom: 8px;
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
         }
-        .header-card .subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 0;
+        
+        .header .subtitle {
             font-size: 16px;
+            color: var(--text-secondary);
             font-weight: 400;
-            line-height: 1.5;
         }
+        
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+        
+        .category-tab:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .category-tab.active {
+            background: var(--accent-black);
+            color: white;
+            border-color: var(--accent-black);
+        }
+        
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 24px;
         }
+        
         .card {
-            background: #f8fafc;
-            border-radius: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             padding: 24px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
+        
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -8px rgba(117, 170, 219, 0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
+        
         .card-full {
             grid-column: span 2;
         }
+        
         .card h3 {
-            color: #1a1a1a;
+            color: var(--text-primary);
             margin-bottom: 16px;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 600;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.01em;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        
         .command-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
+        
         .cmd-btn {
-            background: #75AADB;
+            background: var(--accent-black);
             color: white;
             border: none;
-            padding: 16px 20px;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(117, 170, 219, 0.2);
+            transition: all 0.15s ease;
+            text-align: center;
         }
+        
         .cmd-btn:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(117, 170, 219, 0.3);
-            background: #6a9ed0;
+            background: var(--accent-gray);
         }
-        .cmd-btn:active { transform: translateY(0) scale(0.98); }
+        
+        .cmd-btn:active { 
+            transform: scale(0.98);
+        }
+        
         .cmd-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
+        
         .cmd-btn.success {
-            background: #10b981;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            background: #346538;
         }
+        
         .cmd-btn.success:hover {
-            background: #059669;
-            box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.3);
+            background: #2a522e;
         }
+        
         .cmd-btn.error {
-            background: #ef4444;
-            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+            background: #9F2F2D;
         }
+        
         .cmd-btn.error:hover {
-            background: #dc2626;
-            box-shadow: 0 8px 12px -2px rgba(239, 68, 68, 0.3);
+            background: #8a2624;
+        }
+        
+        .link-btn {
+            background: var(--accent-black);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+        .link-btn:hover {
+            background: var(--accent-gray);
+        }
+        .link-btn:active { 
+            transform: scale(0.98);
         }
         .log-output {
-            background: #0f172a;
-            color: #10b981;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 13px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
             min-height: 160px;
             max-height: 320px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
-            line-height: 1.6;
-            border: 1px solid #1e293b;
+            line-height: 1.5;
+            border: 1px solid var(--border-color);
         }
         .search-box {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-bottom: 16px;
         }
         .search-input {
             flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
             font-family: inherit;
-            background: white;
-            transition: all 0.2s;
+            background: var(--bg-primary);
+            transition: all 0.15s ease;
         }
         .search-input:focus {
             outline: none;
-            border-color: #75AADB;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(117, 170, 219, 0.1);
+            border-color: var(--accent-black);
+            background: var(--bg-primary);
         }
         .refresh-btn {
-            background: #F6B40E;
+            background: var(--accent-black);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(246, 180, 14, 0.2);
+            transition: all 0.15s ease;
         }
         .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(246, 180, 14, 0.3);
-            background: #e5a30d;
-        }
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(246, 180, 14, 0.3);
-            background: #e5a30d;
+            background: var(--accent-gray);
         }
         .clear-btn {
-            background: #ef4444;
+            background: #9F2F2D;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+            transition: all 0.15s ease;
         }
         .clear-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(239, 68, 68, 0.3);
-            background: #dc2626;
+            background: #8a2624;
         }
         .manage-btn {
-            background: #6366f1;
+            background: var(--accent-black);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+            transition: all 0.15s ease;
         }
         .manage-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(99, 102, 241, 0.3);
-            background: #4f46e5;
+            background: var(--accent-gray);
         }
         .modal {
             display: none;
@@ -323,11 +379,9 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             z-index: 1000;
-            align-items: center;
-            justify-content: center;
         }
         #commandModal {
             z-index: 1100;
@@ -345,54 +399,54 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .toast {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             display: flex;
             align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            max-width: 400px;
-            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid #75AADB;
+            gap: 10px;
+            min-width: 280px;
+            max-width: 360px;
+            animation: slideIn 0.2s ease;
+            border: 1px solid var(--border-color);
         }
         .toast.success {
-            border-left-color: #10b981;
+            border-left: 3px solid #346538;
         }
         .toast.error {
-            border-left-color: #ef4444;
+            border-left: 3px solid #9F2F2D;
         }
         .toast.warning {
-            border-left-color: #F6B40E;
+            border-left: 3px solid #956400;
         }
         .toast-icon {
-            font-size: 20px;
+            font-size: 16px;
         }
         .toast-message {
             flex: 1;
-            font-size: 14px;
-            color: #1a1a1a;
-            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 400;
         }
         .toast-close {
             background: none;
             border: none;
-            color: #64748b;
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 18px;
-            padding: 4px;
+            font-size: 16px;
+            padding: 2px;
             line-height: 1;
         }
         .toast-close:hover {
-            color: #1a1a1a;
+            color: var(--text-primary);
         }
         @keyframes slideIn {
             from {
-                transform: translateX(400px);
+                transform: translateX(100%);
                 opacity: 0;
             }
             to {
@@ -406,7 +460,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                 opacity: 1;
             }
             to {
-                transform: translateX(400px);
+                transform: translateX(100%);
                 opacity: 0;
             }
         }
@@ -416,8 +470,8 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             z-index: 1400;
             display: none;
             align-items: center;
@@ -427,270 +481,272 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
             display: flex;
         }
         .confirm-dialog {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 24px;
             max-width: 400px;
             width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
         }
         .confirm-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a1a;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 12px;
+            letter-spacing: -0.01em;
         }
         .confirm-message {
-            font-size: 15px;
-            color: #64748b;
+            font-size: 14px;
+            color: var(--text-secondary);
             line-height: 1.5;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .confirm-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-end;
         }
         .confirm-btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
             border: none;
         }
         .confirm-btn-cancel {
-            background: #e2e8f0;
-            color: #1a1a1a;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         .confirm-btn-cancel:hover {
-            background: #cbd5e1;
+            background: var(--border-color);
         }
         .confirm-btn-confirm {
-            background: #75AADB;
+            background: var(--accent-black);
             color: white;
         }
         .confirm-btn-confirm:hover {
-            background: #6a9ed0;
+            background: var(--accent-gray);
         }
         .confirm-btn-danger {
-            background: #ef4444;
+            background: #9F2F2D;
             color: white;
         }
         .confirm-btn-danger:hover {
-            background: #dc2626;
+            background: #8a2624;
         }
         .modal.active {
-            display: flex;
+            display: block;
         }
         .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 800px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
             width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
         }
         .modal-header h2 {
-            color: #1a1a1a;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
         .close-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            color: #64748b;
-            padding: 8px;
+            color: var(--text-secondary);
+            padding: 4px;
             line-height: 1;
         }
         .close-btn:hover {
-            color: #1a1a1a;
+            color: var(--text-primary);
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #64748b;
-            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
             font-weight: 500;
         }
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
             font-family: inherit;
-            background: white;
-            transition: all 0.2s;
+            background: var(--bg-primary);
+            transition: all 0.15s ease;
             box-sizing: border-box;
         }
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: #75AADB;
-            box-shadow: 0 0 0 3px rgba(117, 170, 219, 0.1);
+            border-color: var(--accent-black);
         }
         .form-group textarea {
-            min-height: 80px;
+            min-height: 60px;
             resize: vertical;
         }
         .form-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
         }
         .submit-btn {
-            background: #75AADB;
+            background: var(--accent-black);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(117, 170, 219, 0.2);
+            transition: all 0.15s ease;
         }
         .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -2px rgba(117, 170, 219, 0.3);
-            background: #6a9ed0;
+            background: var(--accent-gray);
         }
         .cancel-btn {
-            background: #e2e8f0;
-            color: #1a1a1a;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
         }
         .cancel-btn:hover {
-            background: #cbd5e1;
+            background: var(--border-color);
         }
         .command-list {
-            margin-top: 20px;
+            margin-top: 16px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 4px;
         }
         .command-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 10px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
             margin-bottom: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
         }
         .command-item-info {
             flex: 1;
         }
         .command-item-name {
-            font-weight: 600;
-            color: #1a1a1a;
-            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
         }
         .command-item-id {
-            color: #64748b;
-            font-size: 12px;
+            color: var(--text-secondary);
+            font-size: 11px;
             margin-bottom: 4px;
+            font-family: 'JetBrains Mono', monospace;
         }
         .command-item-desc {
-            color: #64748b;
-            font-size: 13px;
+            color: var(--text-secondary);
+            font-size: 12px;
         }
         .command-item-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         .edit-btn {
-            background: #F6B40E;
+            background: var(--accent-black);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
         }
         .edit-btn:hover {
-            background: #e5a30d;
+            background: var(--accent-gray);
         }
         .delete-btn {
-            background: #ef4444;
+            background: #9F2F2D;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
         }
         .delete-btn:hover {
-            background: #dc2626;
+            background: #8a2624;
         }
         .daemon-log-output {
-            background: #0f172a;
-            color: #10b981;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 13px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
             min-height: 300px;
             max-height: 500px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
-            line-height: 1.6;
-            border: 1px solid #1e293b;
+            line-height: 1.5;
+            border: 1px solid var(--border-color);
         }
         .log-stats {
-            font-size: 13px;
-            color: #64748b;
+            font-size: 12px;
+            color: var(--text-secondary);
             margin-top: 12px;
-            font-weight: 500;
+            font-weight: 400;
         }
         @media (max-width: 768px) {
             .bento-grid {
                 grid-template-columns: 1fr;
             }
             .card-full {
-                grid-column: span 1;
-            }
-            .header-card {
                 grid-column: span 1;
             }
             .command-grid {
@@ -709,31 +765,35 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 </head>
 <body>
     <div class="container">
-        <div class="header-card">
-            <h1 id="appTitle">🎯 Command Center</h1>
+        <div class="header">
+            <h1 id="appTitle">Command Center</h1>
             <p class="subtitle" id="appSubtitle">Generic command execution dashboard</p>
         </div>
-        
+
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-tab active" data-category="all">All</button>
+        </div>
+
         <div class="bento-grid">
             <div class="card card-full">
-                <h3>🚀 Quick Commands</h3>
+                <h3>Commands & Links</h3>
                 <div class="command-grid" id="commandGrid">
                     <div class="cmd-btn">Loading commands...</div>
                 </div>
             </div>
             
             <div class="card card-full">
-                <h3>📜 Command Output</h3>
+                <h3>Command Output</h3>
                 <div class="log-output" id="logOutput">Ready to execute commands...</div>
             </div>
             
             <div class="card card-full">
-                <h3>📋 Daemon Logs</h3>
+                <h3>Daemon Logs</h3>
                 <div class="search-box">
                     <input type="text" class="search-input" id="logSearch" placeholder="Search logs..." onkeyup="filterLogs()">
-                    <button class="refresh-btn" onclick="loadDaemonLogs()">🔄 Refresh</button>
-                    <button class="clear-btn" onclick="clearLogs()">🗑️ Clear</button>
-                    <button class="manage-btn" onclick="openCommandManager()">⚙️ Manage Commands</button>
+                    <button class="refresh-btn" onclick="loadDaemonLogs()">Refresh</button>
+                    <button class="clear-btn" onclick="clearLogs()">Clear</button>
+                    <button class="manage-btn" onclick="openCommandManager()">Manage Commands</button>
                 </div>
                 <div class="daemon-log-output" id="daemonLogOutput">Loading logs...</div>
                 <div class="log-stats" id="logStats"></div>
@@ -758,23 +818,48 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                         <input type="text" id="commandName" required placeholder="e.g., My Command">
                     </div>
                     <div class="form-group">
-                        <label for="commandIcon">Icon</label>
-                        <input type="text" id="commandIcon" placeholder="e.g., 🔧">
+                        <label for="commandIcon">Icon (optional)</label>
+                        <input type="text" id="commandIcon" placeholder="e.g., 📋">
                     </div>
                     <div class="form-group">
                         <label for="commandDescription">Description</label>
                         <textarea id="commandDescription" placeholder="Brief description of what this command does"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="commandType">Type *</label>
+                        <select id="commandType" required>
+                            <option value="command">Command</option>
+                            <option value="link">Link</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="commandGroup">
                         <label for="commandCommand">Command *</label>
-                        <textarea id="commandCommand" required placeholder="e.g., echo 'Hello World'"></textarea>
+                        <textarea id="commandCommand" placeholder="e.g., echo 'Hello World'"></textarea>
+                    </div>
+                    <div class="form-group" id="urlGroup" style="display: none;">
+                        <label for="commandURL">URL *</label>
+                        <input type="url" id="commandURL" placeholder="e.g., https://example.com">
                     </div>
                     <div class="form-group">
+                        <label for="commandCategory">Category</label>
+                        <input type="text" id="commandCategory" placeholder="e.g., Development, Monitoring, Tools">
+                    </div>
+                    <div class="form-group" id="supportsArgsGroup">
                         <label style="display: flex; align-items: center; gap: 8px;">
                             <input type="checkbox" id="commandSupportsArgs" style="width: auto;">
                             Enable argument support for this command
                         </label>
-                        <small style="color: #64748b; display: block; margin-top: 5px;">When enabled, clicking this command will show a modal to input extra arguments</small>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px; font-size: 12px;">When enabled, clicking this command will show a modal to input extra arguments</small>
+                    </div>
+                    <div class="form-group" id="argsDescriptionGroup" style="display: none;">
+                        <label for="commandArgsDescription">Arguments Description</label>
+                        <textarea id="commandArgsDescription" placeholder="e.g., --headed true/false for HEADED mode, --args for additional arguments"></textarea>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px; font-size: 12px;">Document the possible arguments this command accepts</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="commandEnv">Environment Variables</label>
+                        <textarea id="commandEnv" placeholder="e.g., NODE_ENV=production,API_KEY=secret"></textarea>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px; font-size: 12px;">Comma-separated KEY=VALUE pairs for environment variables</small>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="cancel-btn" onclick="closeCommandModal()">Cancel</button>
@@ -791,10 +876,10 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                     <h2>Manage Commands</h2>
                     <button class="close-btn" onclick="closeCommandListModal()">&times;</button>
                 </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <button class="submit-btn" onclick="openAddCommandModal()" style="flex: 1;">+ Add New Command</button>
-                    <button class="refresh-btn" onclick="reloadConfig()" style="flex: 1;">🔄 Reload Config</button>
-                    <button class="manage-btn" onclick="openRawConfigModal()" style="flex: 1;">📝 Edit Raw Config</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                    <button class="submit-btn" onclick="openAddCommandModal()" style="flex: 1;">Add Command</button>
+                    <button class="refresh-btn" onclick="reloadConfig()" style="flex: 1;">Reload Config</button>
+                    <button class="manage-btn" onclick="openRawConfigModal()" style="flex: 1;">Edit Raw Config</button>
                 </div>
                 <div class="command-list" id="commandList"></div>
             </div>
@@ -828,11 +913,15 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                 <div class="form-group">
                     <label for="commandArgs">Extra Arguments</label>
                     <input type="text" id="commandArgs" placeholder="e.g., -h, --help, /path/to/file">
-                    <small style="color: #64748b; display: block; margin-top: 5px;">These arguments will be appended to the command</small>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 4px; font-size: 12px;">These arguments will be appended to the command</small>
+                </div>
+                <div class="form-group" id="argsDescriptionDisplay" style="display: none;">
+                    <label>Available Arguments</label>
+                    <div id="argsDescriptionText" style="background: var(--bg-secondary); padding: 12px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color); color: var(--text-primary); font-family: 'JetBrains Mono', monospace;"></div>
                 </div>
                 <div class="form-group">
                     <label>Full Command Preview</label>
-                    <div id="commandPreview" style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; border: 1px solid #e2e8f0;"></div>
+                    <div id="commandPreview" style="background: var(--bg-secondary); padding: 12px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid var(--border-color); color: var(--text-primary);"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" onclick="closeCommandArgsModal()">Cancel</button>
@@ -859,20 +948,21 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
     <script>
         let appConfig = null;
+        let currentCategory = 'all';
 
         // Toast Notification System
         function showToast(message, type, duration) {
             type = type || 'info';
-            duration = duration || 4000;
+            duration = duration || 3000;
 
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = 'toast ' + type;
 
-            let icon = 'ℹ️';
-            if (type === 'success') icon = '✅';
-            if (type === 'error') icon = '❌';
-            if (type === 'warning') icon = '⚠️';
+            let icon = '○';
+            if (type === 'success') icon = '✓';
+            if (type === 'error') icon = '✕';
+            if (type === 'warning') icon = '!';
 
             toast.innerHTML = '<span class="toast-icon">' + icon + '</span><span class="toast-message">' + message + '</span><button class="toast-close" onclick="removeToast(this.parentElement)">×</button>';
 
@@ -885,12 +975,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
         }
 
         function removeToast(toast) {
-            toast.style.animation = 'slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            toast.style.animation = 'slideOut 0.2s ease';
             setTimeout(function() {
                 if (toast.parentElement) {
                     toast.parentElement.removeChild(toast);
                 }
-            }, 300);
+            }, 200);
         }
 
         // Custom Confirmation Dialog
@@ -952,6 +1042,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                     appConfig = data;
                     document.getElementById('appTitle').textContent = '🎯 ' + data.title;
                     document.getElementById('appSubtitle').textContent = data.subtitle;
+                    renderCategories(data.commands);
                     renderCommands(data.commands);
                 })
                 .catch(error => {
@@ -959,31 +1050,103 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                     document.getElementById('commandGrid').innerHTML = '<div class="cmd-btn">Error loading commands</div>';
                 });
         }
+
+        function renderCategories(commands) {
+            const categories = new Set();
+            commands.forEach(cmd => {
+                if (cmd.category) {
+                    categories.add(cmd.category);
+                }
+            });
+
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '<button class="category-tab active" data-category="all">All</button>';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = 'category-tab';
+                tab.setAttribute('data-category', category);
+                tab.textContent = category;
+                tab.onclick = () => filterByCategory(category);
+                tabsContainer.appendChild(tab);
+            });
+
+            // Add click handler to "All" tab
+            tabsContainer.querySelector('[data-category="all"]').onclick = () => filterByCategory('all');
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+
+            // Update tab styling
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-category') === category) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Filter commands
+            const filteredCommands = category === 'all'
+                ? appConfig.commands
+                : appConfig.commands.filter(cmd => cmd.category === category);
+
+            renderCommands(filteredCommands);
+        }
         
         function renderCommands(commands) {
             const grid = document.getElementById('commandGrid');
             grid.innerHTML = '';
-            
+
             commands.forEach(cmd => {
-                const button = document.createElement('button');
-                button.className = 'cmd-btn';
-                button.textContent = cmd.icon + ' ' + cmd.name;
-                button.onclick = () => executeCommand(cmd.id, cmd.name);
-                button.title = cmd.description;
-                button.setAttribute('data-original-text', cmd.icon + ' ' + cmd.name);
-                grid.appendChild(button);
+                if ((cmd.type === 'link' || cmd.type === '') && cmd.url) {
+                    // Render as link
+                    const link = document.createElement('a');
+                    link.className = 'link-btn';
+                    link.textContent = cmd.icon + ' ' + cmd.name;
+                    link.href = cmd.url;
+                    link.target = '_blank';
+                    link.title = cmd.description;
+                    grid.appendChild(link);
+                } else {
+                    // Render as command button
+                    const button = document.createElement('button');
+                    button.className = 'cmd-btn';
+                    button.textContent = cmd.icon + ' ' + cmd.name;
+                    button.title = cmd.description;
+                    button.setAttribute('data-original-text', cmd.icon + ' ' + cmd.name);
+                    
+                    // Handle single/double click distinction
+                    let clickTimeout;
+                    button.onclick = function(e) {
+                        if (clickTimeout) {
+                            // This is a double-click
+                            clearTimeout(clickTimeout);
+                            clickTimeout = null;
+                            executeCommand(cmd.id, cmd.name, true);
+                        } else {
+                            // Wait to see if it's a double-click
+                            clickTimeout = setTimeout(function() {
+                                clickTimeout = null;
+                                executeCommand(cmd.id, cmd.name, false);
+                            }, 250);
+                        }
+                    };
+                    
+                    grid.appendChild(button);
+                }
             });
         }
         
-        function executeCommand(commandId, commandName) {
+        function executeCommand(commandId, commandName, skipArgs = false) {
             const logOutput = document.getElementById('logOutput');
             const button = event.target;
 
             // Find command in config
             const cmd = appConfig.commands.find(c => c.id === commandId);
-            if (cmd && cmd.supports_args) {
+            if (cmd && cmd.supports_args && !skipArgs) {
                 // Show args modal
-                openCommandArgsModal(commandId, commandName, cmd.command);
+                openCommandArgsModal(commandId, commandName, cmd.command, cmd.args_description);
                 return;
             }
 
@@ -1027,14 +1190,26 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
         let currentCommandName = null;
         let currentBaseCommand = null;
 
-        function openCommandArgsModal(commandId, commandName, baseCommand) {
+        function openCommandArgsModal(commandId, commandName, baseCommand, argsDescription) {
             currentCommandId = commandId;
             currentCommandName = commandName;
             currentBaseCommand = baseCommand;
 
             document.getElementById('argsModalTitle').textContent = 'Execute: ' + commandName;
             document.getElementById('commandArgs').value = '';
+
+            // Show args description if available
+            const argsDescriptionDisplay = document.getElementById('argsDescriptionDisplay');
+            const argsDescriptionText = document.getElementById('argsDescriptionText');
+            if (argsDescription && argsDescription.trim() !== '') {
+                argsDescriptionText.textContent = argsDescription;
+                argsDescriptionDisplay.style.display = 'block';
+            } else {
+                argsDescriptionDisplay.style.display = 'none';
+            }
+
             updateCommandPreview();
+            document.body.style.overflow = 'hidden';
             document.getElementById('commandArgsModal').classList.add('active');
 
             // Add event listener for live preview
@@ -1043,6 +1218,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
         function closeCommandArgsModal() {
             document.getElementById('commandArgsModal').classList.remove('active');
+            document.body.style.overflow = '';
             document.getElementById('commandArgs').removeEventListener('input', updateCommandPreview);
             currentCommandId = null;
             currentCommandName = null;
@@ -1167,12 +1343,14 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
         // Command Management Functions
         function openCommandManager() {
+            document.body.style.overflow = 'hidden';
             document.getElementById('commandListModal').classList.add('active');
             loadCommandList();
         }
 
         function closeCommandListModal() {
             document.getElementById('commandListModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         function loadCommandList() {
@@ -1202,7 +1380,50 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
             document.getElementById('commandIcon').value = '';
             document.getElementById('commandDescription').value = '';
             document.getElementById('commandCommand').value = '';
+            document.getElementById('commandURL').value = '';
+            document.getElementById('commandCategory').value = '';
+            document.getElementById('commandType').value = 'command';
+            document.getElementById('commandSupportsArgs').checked = false;
+            document.getElementById('commandArgsDescription').value = '';
+            toggleTypeFields();
+            document.body.style.overflow = 'hidden';
             document.getElementById('commandModal').classList.add('active');
+        }
+
+        // Type toggle handler
+        document.getElementById('commandType').addEventListener('change', toggleTypeFields);
+        
+        // Supports args checkbox handler
+        document.getElementById('commandSupportsArgs').addEventListener('change', toggleArgsDescription);
+
+        function toggleTypeFields() {
+            const type = document.getElementById('commandType').value;
+            const commandGroup = document.getElementById('commandGroup');
+            const urlGroup = document.getElementById('urlGroup');
+            const supportsArgsGroup = document.getElementById('supportsArgsGroup');
+            const commandCommand = document.getElementById('commandCommand');
+
+            if (type === 'link') {
+                commandGroup.style.display = 'none';
+                urlGroup.style.display = 'block';
+                supportsArgsGroup.style.display = 'none';
+                commandCommand.removeAttribute('required');
+                document.getElementById('commandURL').setAttribute('required', 'required');
+            } else {
+                commandGroup.style.display = 'block';
+                urlGroup.style.display = 'none';
+                supportsArgsGroup.style.display = 'block';
+                commandCommand.setAttribute('required', 'required');
+                document.getElementById('commandURL').removeAttribute('required');
+            }
+            // Always call toggleArgsDescription to ensure proper visibility
+            toggleArgsDescription();
+        }
+
+        function toggleArgsDescription() {
+            const supportsArgs = document.getElementById('commandSupportsArgs').checked;
+            const argsDescriptionGroup = document.getElementById('argsDescriptionGroup');
+            argsDescriptionGroup.style.display = supportsArgs ? 'block' : 'none';
         }
 
         function openEditCommandModal(commandId) {
@@ -1218,8 +1439,20 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                         document.getElementById('commandName').value = cmd.name;
                         document.getElementById('commandIcon').value = cmd.icon || '';
                         document.getElementById('commandDescription').value = cmd.description || '';
-                        document.getElementById('commandCommand').value = cmd.command;
+                        document.getElementById('commandCommand').value = cmd.command || '';
+                        document.getElementById('commandURL').value = cmd.url || '';
+                        document.getElementById('commandCategory').value = cmd.category || '';
+                        document.getElementById('commandType').value = cmd.type || 'command';
                         document.getElementById('commandSupportsArgs').checked = cmd.supports_args || false;
+                        document.getElementById('commandArgsDescription').value = cmd.args_description || '';
+                        // Convert env object back to comma-separated string
+                        let envString = '';
+                        if (cmd.env && typeof cmd.env === 'object') {
+                            envString = Object.entries(cmd.env).map(function(entry) { return entry[0] + '=' + entry[1]; }).join(',');
+                        }
+                        document.getElementById('commandEnv').value = envString;
+                        toggleTypeFields();
+                        document.body.style.overflow = 'hidden';
                         document.getElementById('commandModal').classList.add('active');
                     }
                 })
@@ -1230,18 +1463,25 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
         function closeCommandModal() {
             document.getElementById('commandModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         function handleCommandSubmit(event) {
             event.preventDefault();
             const editId = document.getElementById('editCommandId').value;
+            const type = document.getElementById('commandType').value;
             const commandData = {
                 id: document.getElementById('commandId').value,
                 name: document.getElementById('commandName').value,
                 icon: document.getElementById('commandIcon').value,
                 description: document.getElementById('commandDescription').value,
-                command: document.getElementById('commandCommand').value,
-                supports_args: document.getElementById('commandSupportsArgs').checked
+                type: type,
+                command: type === 'command' ? document.getElementById('commandCommand').value : '',
+                url: type === 'link' ? document.getElementById('commandURL').value : '',
+                category: document.getElementById('commandCategory').value,
+                supports_args: type === 'command' ? document.getElementById('commandSupportsArgs').checked : false,
+                args_description: type === 'command' ? document.getElementById('commandArgsDescription').value : '',
+                env: document.getElementById('commandEnv').value
             };
 
             if (editId) {
@@ -1343,6 +1583,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                 .then(config => {
                     const editor = document.getElementById('rawConfigEditor');
                     editor.value = JSON.stringify(config, null, 2);
+                    document.body.style.overflow = 'hidden';
                     document.getElementById('rawConfigModal').classList.add('active');
                 })
                 .catch(error => {
@@ -1353,6 +1594,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
         function closeRawConfigModal() {
             document.getElementById('rawConfigModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         function saveRawConfig() {
@@ -1446,8 +1688,8 @@ func handleCommandAPI(w http.ResponseWriter, r *http.Request) {
 		if cmdRequest.Args != "" {
 			fullCommand = fullCommand + " " + cmdRequest.Args
 		}
-		// Execute the configured command
-		output, success = executeShellCommand(fullCommand)
+		// Execute the configured command with environment variables
+		output, success = executeShellCommand(fullCommand, cmdConfig.Env)
 	}
 
 	// Write command execution to daemon log
@@ -1641,12 +1883,17 @@ func handleAddCommandAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var cmdRequest struct {
-		ID           string `json:"id"`
-		Name         string `json:"name"`
-		Description  string `json:"description"`
-		Icon         string `json:"icon"`
-		Command      string `json:"command"`
-		SupportsArgs bool   `json:"supports_args"`
+		ID              string            `json:"id"`
+		Name            string            `json:"name"`
+		Description     string            `json:"description"`
+		Icon            string            `json:"icon"`
+		Command         string            `json:"command"`
+		URL             string            `json:"url"`
+		Type            string            `json:"type"`
+		Category        string            `json:"category"`
+		SupportsArgs    bool              `json:"supports_args"`
+		ArgsDescription string            `json:"args_description"`
+		Env             string            `json:"env"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&cmdRequest); err != nil {
@@ -1658,11 +1905,35 @@ func handleAddCommandAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if cmdRequest.ID == "" || cmdRequest.Name == "" || cmdRequest.Command == "" {
+	if cmdRequest.ID == "" || cmdRequest.Name == "" {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"error":   "id, name, and command are required",
+			"error":   "id and name are required",
+		})
+		return
+	}
+
+	// Validate type-specific fields
+	cmdType := cmdRequest.Type
+	if cmdType == "" {
+		cmdType = "command" // Default to command
+	}
+
+	if cmdType == "command" && cmdRequest.Command == "" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "command is required for type 'command'",
+		})
+		return
+	}
+
+	if cmdType == "link" && cmdRequest.URL == "" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "url is required for type 'link'",
 		})
 		return
 	}
@@ -1681,12 +1952,17 @@ func handleAddCommandAPI(w http.ResponseWriter, r *http.Request) {
 
 	// Add new command
 	newCommand := Command{
-		ID:           cmdRequest.ID,
-		Name:         cmdRequest.Name,
-		Description:  cmdRequest.Description,
-		Icon:         cmdRequest.Icon,
-		Command:      cmdRequest.Command,
-		SupportsArgs: cmdRequest.SupportsArgs,
+		ID:              cmdRequest.ID,
+		Name:            cmdRequest.Name,
+		Description:     cmdRequest.Description,
+		Icon:            cmdRequest.Icon,
+		Command:         cmdRequest.Command,
+		URL:             cmdRequest.URL,
+		Type:            cmdType,
+		Category:        cmdRequest.Category,
+		SupportsArgs:    cmdRequest.SupportsArgs,
+		ArgsDescription: cmdRequest.ArgsDescription,
+		Env:             parseEnvVars(cmdRequest.Env),
 	}
 
 	appConfig.Commands = append(appConfig.Commands, newCommand)
@@ -1716,12 +1992,17 @@ func handleEditCommandAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var cmdRequest struct {
-		ID           string `json:"id"`
-		Name         string `json:"name"`
-		Description  string `json:"description"`
-		Icon         string `json:"icon"`
-		Command      string `json:"command"`
-		SupportsArgs bool   `json:"supports_args"`
+		ID              string            `json:"id"`
+		Name            string            `json:"name"`
+		Description     string            `json:"description"`
+		Icon            string            `json:"icon"`
+		Command         string            `json:"command"`
+		URL             string            `json:"url"`
+		Type            string            `json:"type"`
+		Category        string            `json:"category"`
+		SupportsArgs    bool              `json:"supports_args"`
+		ArgsDescription string            `json:"args_description"`
+		Env             string            `json:"env"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&cmdRequest); err != nil {
@@ -1759,7 +2040,22 @@ func handleEditCommandAPI(w http.ResponseWriter, r *http.Request) {
 			if cmdRequest.Command != "" {
 				appConfig.Commands[i].Command = cmdRequest.Command
 			}
+			if cmdRequest.URL != "" {
+				appConfig.Commands[i].URL = cmdRequest.URL
+			}
+			if cmdRequest.Type != "" {
+				appConfig.Commands[i].Type = cmdRequest.Type
+			}
+			if cmdRequest.Category != "" {
+				appConfig.Commands[i].Category = cmdRequest.Category
+			}
 			appConfig.Commands[i].SupportsArgs = cmdRequest.SupportsArgs
+			if cmdRequest.ArgsDescription != "" {
+				appConfig.Commands[i].ArgsDescription = cmdRequest.ArgsDescription
+			}
+			if cmdRequest.Env != "" {
+				appConfig.Commands[i].Env = parseEnvVars(cmdRequest.Env)
+			}
 			break
 		}
 	}
@@ -1910,8 +2206,17 @@ func handleRawConfigAPI(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
-func executeShellCommand(command string) (string, bool) {
+func executeShellCommand(command string, envVars map[string]string) (string, bool) {
 	cmd := exec.Command("bash", "-c", command)
+	
+	// Set environment variables
+	if len(envVars) > 0 {
+		cmd.Env = append(os.Environ())
+		for key, value := range envVars {
+			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+		}
+	}
+	
 	output, err := cmd.CombinedOutput()
 	
 	if err != nil {

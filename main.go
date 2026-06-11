@@ -12,6 +12,33 @@ const Version = "1.0.0"
 
 const appName = "cmdcenter"
 
+func parseEnvVars(envString string) map[string]string {
+	if envString == "" {
+		return nil
+	}
+	
+	envMap := make(map[string]string)
+	pairs := strings.Split(envString, ",")
+	
+	for _, pair := range pairs {
+		pair = strings.TrimSpace(pair)
+		if pair == "" {
+			continue
+		}
+		
+		parts := strings.SplitN(pair, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			if key != "" {
+				envMap[key] = value
+			}
+		}
+	}
+	
+	return envMap
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		printHelp()
@@ -114,13 +141,29 @@ func handleAddCommand() {
 	name := addCmd.String("name", "", "Command name (required)")
 	description := addCmd.String("description", "", "Command description")
 	icon := addCmd.String("icon", "🎯", "Command icon (emoji)")
-	command := addCmd.String("command", "", "Shell command to execute (required)")
+	command := addCmd.String("command", "", "Shell command to execute")
+	url := addCmd.String("url", "", "URL for link type")
+	cmdType := addCmd.String("type", "command", "Type: command or link (default: command)")
+	category := addCmd.String("category", "", "Category for grouping")
 	supportsArgs := addCmd.Bool("supports-args", false, "Enable argument support")
+	argsDescription := addCmd.String("args-description", "", "Description of possible arguments")
+	envVars := addCmd.String("env", "", "Environment variables (KEY=VALUE, comma-separated)")
 	addCmd.Parse(os.Args[2:])
 
-	if *id == "" || *name == "" || *command == "" {
-		fmt.Fprintf(os.Stderr, "Error: id, name, and command are required\n")
-		fmt.Println("Usage: cmdcenter add --id <id> --name <name> --command <command> [--description <desc>] [--icon <icon>] [--supports-args]")
+	if *id == "" || *name == "" {
+		fmt.Fprintf(os.Stderr, "Error: id and name are required\n")
+		fmt.Println("Usage: cmdcenter add --id <id> --name <name> [--command <command>] [--url <url>] [--type <type>] [--category <category>] [--description <desc>] [--icon <icon>] [--supports-args] [--args-description <args_desc>] [--env <env_vars>]")
+		os.Exit(1)
+	}
+
+	// Validate type-specific fields
+	if *cmdType == "command" && *command == "" {
+		fmt.Fprintf(os.Stderr, "Error: command is required for type 'command'\n")
+		os.Exit(1)
+	}
+
+	if *cmdType == "link" && *url == "" {
+		fmt.Fprintf(os.Stderr, "Error: url is required for type 'link'\n")
 		os.Exit(1)
 	}
 
@@ -142,12 +185,17 @@ func handleAddCommand() {
 
 	// Add new command
 	newCommand := Command{
-		ID:           *id,
-		Name:         *name,
-		Description:  *description,
-		Icon:         *icon,
-		Command:      *command,
-		SupportsArgs: *supportsArgs,
+		ID:              *id,
+		Name:            *name,
+		Description:     *description,
+		Icon:            *icon,
+		Command:         *command,
+		URL:             *url,
+		Type:            *cmdType,
+		Category:        *category,
+		SupportsArgs:    *supportsArgs,
+		ArgsDescription: *argsDescription,
+		Env:             parseEnvVars(*envVars),
 	}
 
 	config.Commands = append(config.Commands, newCommand)
@@ -157,7 +205,7 @@ func handleAddCommand() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("✅ Added command: %s (%s)\n", *name, *id)
+	fmt.Printf("✅ Added %s: %s (%s)\n", *cmdType, *name, *id)
 }
 
 func handleEditCommand() {
@@ -167,12 +215,17 @@ func handleEditCommand() {
 	description := editCmd.String("description", "", "New command description")
 	icon := editCmd.String("icon", "", "New command icon")
 	command := editCmd.String("command", "", "New shell command")
+	url := editCmd.String("url", "", "New URL for link type")
+	cmdType := editCmd.String("type", "", "New type: command or link")
+	category := editCmd.String("category", "", "New category for grouping")
 	supportsArgs := editCmd.Bool("supports-args", false, "Enable argument support")
+	argsDescription := editCmd.String("args-description", "", "New args description")
+	envVars := editCmd.String("env", "", "Environment variables (KEY=VALUE, comma-separated)")
 	editCmd.Parse(os.Args[2:])
 
 	if *id == "" {
 		fmt.Fprintf(os.Stderr, "Error: id is required\n")
-		fmt.Println("Usage: cmdcenter edit --id <id> [--name <name>] [--command <command>] [--description <desc>] [--icon <icon>] [--supports-args]")
+		fmt.Println("Usage: cmdcenter edit --id <id> [--name <name>] [--command <command>] [--url <url>] [--type <type>] [--category <category>] [--description <desc>] [--icon <icon>] [--supports-args] [--args-description <args_desc>] [--env <env_vars>]")
 		os.Exit(1)
 	}
 
@@ -199,7 +252,22 @@ func handleEditCommand() {
 			if *command != "" {
 				config.Commands[i].Command = *command
 			}
+			if *url != "" {
+				config.Commands[i].URL = *url
+			}
+			if *cmdType != "" {
+				config.Commands[i].Type = *cmdType
+			}
+			if *category != "" {
+				config.Commands[i].Category = *category
+			}
 			config.Commands[i].SupportsArgs = *supportsArgs
+			if *argsDescription != "" {
+				config.Commands[i].ArgsDescription = *argsDescription
+			}
+			if *envVars != "" {
+				config.Commands[i].Env = parseEnvVars(*envVars)
+			}
 			break
 		}
 	}
@@ -260,10 +328,18 @@ func handleRunCommand() {
 
 	fmt.Printf("Executing: %s\n", fullCommand)
 
-	// Execute command
+	// Execute command with environment variables
 	execCmd := exec.Command("bash", "-c", fullCommand)
 	execCmd.Stdout = os.Stdout
 	execCmd.Stderr = os.Stderr
+	
+	// Set environment variables
+	if len(cmdToRun.Env) > 0 {
+		execCmd.Env = append(os.Environ())
+		for key, value := range cmdToRun.Env {
+			execCmd.Env = append(execCmd.Env, fmt.Sprintf("%s=%s", key, value))
+		}
+	}
 
 	if err := execCmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error executing command: %v\n", err)
@@ -326,7 +402,7 @@ func handleListCommands() {
 	fmt.Printf("Title: %s\n", config.Title)
 	fmt.Printf("Subtitle: %s\n", config.Subtitle)
 	fmt.Println("\nCommands:")
-	
+
 	if len(config.Commands) == 0 {
 		fmt.Println("  No commands configured")
 		return
@@ -336,7 +412,27 @@ func handleListCommands() {
 		fmt.Printf("  %d. %s (%s)\n", i+1, cmd.Name, cmd.ID)
 		fmt.Printf("     Description: %s\n", cmd.Description)
 		fmt.Printf("     Icon: %s\n", cmd.Icon)
-		fmt.Printf("     Command: %s\n", cmd.Command)
+		fmt.Printf("     Type: %s\n", cmd.Type)
+		if cmd.Type == "command" {
+			fmt.Printf("     Command: %s\n", cmd.Command)
+		} else if cmd.Type == "link" {
+			fmt.Printf("     URL: %s\n", cmd.URL)
+		}
+		if cmd.Category != "" {
+			fmt.Printf("     Category: %s\n", cmd.Category)
+		}
+		if cmd.SupportsArgs {
+			fmt.Printf("     Supports Args: true\n")
+			if cmd.ArgsDescription != "" {
+				fmt.Printf("     Args Description: %s\n", cmd.ArgsDescription)
+			}
+		}
+		if len(cmd.Env) > 0 {
+			fmt.Printf("     Environment Variables:\n")
+			for key, value := range cmd.Env {
+				fmt.Printf("       %s=%s\n", key, value)
+			}
+		}
 		fmt.Println()
 	}
 }
@@ -368,18 +464,28 @@ func printHelp() {
 	fmt.Println("Add Options:")
 	fmt.Println("  --id string          Command ID (required)")
 	fmt.Println("  --name string        Command name (required)")
-	fmt.Println("  --command string     Shell command (required)")
+	fmt.Println("  --command string     Shell command (for command type)")
+	fmt.Println("  --url string         URL (for link type)")
+	fmt.Println("  --type string        Type: command or link (default: command)")
+	fmt.Println("  --category string    Category for grouping")
 	fmt.Println("  --description string Command description")
 	fmt.Println("  --icon string        Command icon (emoji)")
 	fmt.Println("  --supports-args      Enable argument support for this command")
+	fmt.Println("  --args-description string Description of possible arguments")
+	fmt.Println("  --env string         Environment variables (KEY=VALUE, comma-separated)")
 	fmt.Println()
 	fmt.Println("Edit Options:")
 	fmt.Println("  --id string          Command ID to edit (required)")
 	fmt.Println("  --name string        New command name")
 	fmt.Println("  --command string     New shell command")
+	fmt.Println("  --url string         New URL for link type")
+	fmt.Println("  --type string        New type: command or link")
+	fmt.Println("  --category string    New category for grouping")
 	fmt.Println("  --description string New command description")
 	fmt.Println("  --icon string        New command icon")
 	fmt.Println("  --supports-args      Enable argument support for this command")
+	fmt.Println("  --args-description string New args description")
+	fmt.Println("  --env string         Environment variables (KEY=VALUE, comma-separated)")
 	fmt.Println()
 	fmt.Println("Remove Options:")
 	fmt.Println("  --id string          Command ID to remove (required)")
@@ -395,6 +501,7 @@ func printHelp() {
 	fmt.Println("  cmdcenter init")
 	fmt.Println("  cmdcenter add --id disk-usage --name 'Disk Usage' --command 'df -h' --icon '💾'")
 	fmt.Println("  cmdcenter add --id df --name 'Disk Free' --command 'df' --icon '💾' --supports-args")
+	fmt.Println("  cmdcenter add --id google --name 'Google' --url 'https://google.com' --type link --category 'Search' --icon '🔍'")
 	fmt.Println("  cmdcenter edit --id disk-usage --command 'df -h | grep /'")
 	fmt.Println("  cmdcenter remove --id disk-usage")
 	fmt.Println("  cmdcenter list")

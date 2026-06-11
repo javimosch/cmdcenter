@@ -8,12 +8,17 @@ import (
 )
 
 type Command struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	Icon         string `json:"icon"`
-	Command      string `json:"command"`
-	SupportsArgs bool   `json:"supports_args"`
+	ID              string            `json:"id"`
+	Name            string            `json:"name"`
+	Description     string            `json:"description"`
+	Icon            string            `json:"icon"`
+	Command         string            `json:"command"`
+	URL             string            `json:"url"`
+	Type            string            `json:"type"`             // "command" or "link"
+	Category        string            `json:"category"`         // For grouping
+	SupportsArgs    bool              `json:"supports_args"`
+	ArgsDescription string            `json:"args_description"` // Description of possible arguments
+	Env             map[string]string `json:"env"`              // Environment variables to set
 }
 
 type Config struct {

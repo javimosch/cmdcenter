@@ -100,9 +100,108 @@ Web UI available at `http://localhost:3031` when daemon is running. Provides:
 - Toast notifications (non-blocking)
 - Custom confirmation dialogs
 
+## Docker Deployment (v2.4.1+)
+
+### Docker Commands for Agents
+Agents can deploy and manage cmdcenter via Docker:
+
+```bash
+# Build Docker image
+docker compose build
+
+# Start container
+docker compose up -d
+
+# Stop container
+docker compose down
+
+# View logs
+docker compose logs -f cmdcenter
+
+# Restart container
+docker compose restart
+
+# Execute command inside container
+docker exec -it cmdcenter sh
+```
+
+### Docker Configuration
+Required files:
+- `Dockerfile` - Multi-stage Go build configuration (for compose.yml)
+- `compose.yml` - Build-based deployment (development)
+- `compose.binary.yml` - Binary-based deployment (production)
+- `config/config.json` - Persistent configuration (volume mounted)
+
+**Important**: Docker configuration is cmdcenter's responsibility. Hotify only manages which compose file to use (similar to Coolify).
+
+### Volume Mount
+- Host directory: `./config`
+- Container directory: `/root/.cmdcenter`
+- Purpose: Persist commands across container restarts
+
+### Traefik Integration
+Docker deployment includes Traefik labels for automatic reverse proxy:
+- Automatic SSL via Let's Encrypt
+- Domain routing (e.g., cmdcenter.intrane.fr)
+- HTTP to HTTPS redirect
+
+Enable Traefik Docker provider if needed:
+```bash
+hotify-cli docker enable-traefik
+sudo systemctl restart traefik
+```
+
+### Docker Deployment Workflow
+```bash
+# 1. Stop non-docker process if running
+pkill cmdcenter
+
+# 2. Ensure config exists
+mkdir -p config
+echo '{"title":"Command Center","subtitle":"Generic command execution dashboard","commands":[]}' > config/config.json
+
+# 3. Choose compose file and start
+# For development (builds from source):
+docker compose -f compose.yml up -d
+
+# For production (uses pre-built binary):
+docker compose -f compose.binary.yml up -d
+
+# 4. Enable Traefik provider (if not already)
+hotify-cli docker enable-traefik
+sudo systemctl restart traefik
+
+# 5. Verify deployment
+curl http://localhost:3031/api/health
+curl https://cmdcenter.intrane.fr/api/health
+```
+
+### Choosing the Right Compose File
+- **compose.yml**: Use for development, builds from source (~80s build, ~20MB image)
+- **compose.binary.yml**: Use for production, uses pre-built binary (no build, ~74MB image)
+- Hotify can switch between compose files (cmdcenter provides the files)
+
+### API Access in Docker
+API endpoints work the same in Docker:
+- Local: `http://localhost:3031/api/*`
+- Via Traefik: `https://cmdcenter.intrane.fr/api/*`
+
+Config management via API persists to volume mount:
+```bash
+# Add command via API (persists to host config/)
+curl -X POST http://localhost:3031/api/config/commands/add \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"test","name":"Test","command":"echo hello","icon":"🧪"}'
+```
+
 ## Notes for Agents
-- Always use `cmdcenter init` to create initial config
+- Always use `cmdcenter init` to create initial config (non-Docker)
+- For Docker, ensure `config/config.json` exists with proper structure
 - Use unique IDs for commands to avoid conflicts
 - The `supports-args` flag enables argument input modal in UI and CLI args support
-- Config changes via CLI automatically update the running daemon
-- Logs are stored at `/tmp/cmdcenter.log`
+- Config changes via CLI automatically update the running daemon (non-Docker)
+- Config changes via API persist to volume mount in Docker
+- Logs: `/tmp/cmdcenter.log` (non-Docker) or `docker compose logs` (Docker)
+- Docker deployment requires Docker and Docker Compose
+- Traefik integration requires hotify-cli v2.4.0+ and Traefik v3.6+
+- Known bug: Config file may have `"commands": null` after removal - should be `"commands": []`
