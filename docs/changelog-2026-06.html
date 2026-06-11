@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>June 2026 Changelog - Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0a0a0b] text-slate-100">
+    <div class="max-w-5xl mx-auto px-6 py-16">
+        <div class="mb-8">
+            <a href="changelog.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Changelogs
+            </a>
+        </div>
+        
+        <h1 class="text-4xl font-bold text-white mb-2">June 2026</h1>
+        <p class="text-slate-400 mb-12">Command Center v1.0.0</p>
+        
+        <div class="mb-8">
+            <div class="flex gap-2 border-b border-slate-800">
+                <button onclick="showTab('product')" id="product-tab" class="px-4 py-2 text-sm font-medium text-white border-b-2 border-blue-500">Product</button>
+                <button onclick="showTab('technical')" id="technical-tab" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent">Technical</button>
+            </div>
+        </div>
+        
+        <div id="product-content">
+            <div class="space-y-4">
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">🎨</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Minimalist UI Redesign</h3>
+              <p class="text-slate-400 leading-relaxed">Complete UI overhaul with warm monochrome palette, Inter and JetBrains Mono fonts, and premium editorial aesthetic. Removed gradients, bright colors, and heavy shadows for a cleaner, more professional appearance.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">🔗</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Link Type Support</h3>
+              <p class="text-slate-400 leading-relaxed">Added support for link-type commands that open URLs instead of executing shell commands. Commands can now be categorized as either shell commands or web links with unified management interface.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">📂</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Category Grouping</h3>
+              <p class="text-slate-400 leading-relaxed">Implemented category-based organization for commands and links. Added category tabs for filtering and better organization of the command dashboard.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">⚙️</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Environment Variables</h3>
+              <p class="text-slate-400 leading-relaxed">Added support for environment variables in command execution. Commands can now specify KEY=VALUE pairs that are set before execution for better configuration management.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">🐛</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Modal Positioning Fix</h3>
+              <p class="text-slate-400 leading-relaxed">Fixed modal positioning to be properly centered in viewport regardless of page scroll. Added body scroll lock when modals are open to prevent background scrolling.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-lg bg-slate-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="text-2xl">🐳</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">Docker Deployment</h3>
+              <p class="text-slate-400 leading-relaxed">Added Docker deployment support with compose files for both development and production. Includes Traefik integration for automatic SSL and domain routing.</p>
+            </div>
+          </div>
+        </div>
+            </div>
+        </div>
+        
+        <div id="technical-content" class="hidden">
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-brand-400 mb-3">🚀 Features</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-3 text-slate-300">
+                            <span class="text-slate-500 mt-1">•</span>
+                            <span class="font-mono text-sm">5b0268d</span>
+                            <span class="text-slate-400">feat: redesign with minimalist UI and add link support</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tab) {
+            document.getElementById('product-content').classList.add('hidden');
+            document.getElementById('technical-content').classList.add('hidden');
+            document.getElementById('product-tab').classList.remove('border-blue-500', 'text-white');
+            document.getElementById('product-tab').classList.add('border-transparent', 'text-slate-400');
+            document.getElementById('technical-tab').classList.remove('border-blue-500', 'text-white');
+            document.getElementById('technical-tab').classList.add('border-transparent', 'text-slate-400');
+            
+            document.getElementById(tab + '-content').classList.remove('hidden');
+            document.getElementById(tab + '-tab').classList.remove('border-transparent', 'text-slate-400');
+            document.getElementById(tab + '-tab').classList.add('border-blue-500', 'text-white');
+        }
+    </script>
+</body>
+</html>
